@@ -32,18 +32,21 @@ namespace poc_serilog_dateformat
             Log.Information("DateTime custom formatted: " + dateTime);
 
 
-               
 
-            // Setting the global DataTime format
-            
-            CultureInfo customCulture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
-            customCulture.DateTimeFormat.ShortDatePattern = "yyyy-MM-dd";
-            customCulture.DateTimeFormat.LongTimePattern = "HH:mm:ss.fff";
+            // Configure globalization
+            var dateTimeFormat = configuration.GetSection("Globalization:DateTimeFormat").Get<DateTimeFormatInfo>()
+                ?? new DateTimeFormatInfo();
+
+            var customCulture = new CultureInfo(
+                configuration.GetValue<string>("Globalization:DefaultCulture") ?? "en-US");
+
+            customCulture.DateTimeFormat = dateTimeFormat;
+
             CultureInfo.DefaultThreadCurrentCulture = customCulture;
             CultureInfo.DefaultThreadCurrentUICulture = customCulture;
 
-                             
-            Log.Information("DateTime global culture  : " + DateTime.Now.ToString());
+
+            Log.Information("DateTime global culture (note how it doesn't use FullDateTimePattern (check appsettings) : " + DateTime.Now.ToString());
 
 
             Console.WriteLine("Press any key to exit...");
